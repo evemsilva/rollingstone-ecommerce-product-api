@@ -2,6 +2,7 @@ package com.rollingstone.spring.service;
 
 import com.rollingstone.spring.dao.ProductDaoRepository;
 import com.rollingstone.spring.model.Product;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,12 +12,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 public class ProductServiceImpl implements ProductService {
 
-    final static Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
+    private final static Logger logger = LoggerFactory.getLogger(ProductServiceImpl.class);
 
     @Autowired
     private ProductDaoRepository productDao;
@@ -39,12 +38,6 @@ public class ProductServiceImpl implements ProductService {
             logger.info("Product Parent Category is not null Id :" + product.getParentCategory().getId());
 
         }
-
-        return productDao.save(product);
-    }
-
-    public Product saveProductWithoutValidation(Product product) {
-        logger.info("Hystrix Circuit Breaker Enabled and called fallback method");
 
         return productDao.save(product);
     }

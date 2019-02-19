@@ -13,18 +13,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class RestControllerAspect {
 
-	private final Logger logger = LoggerFactory.getLogger(RestControllerAspect.class);
-	
-	Counter productCreatedCounter = Metrics.counter("com.rollingstone.product.created");
-	
-	@Before("execution(public * com.rollingstone.spring.controller.*Controller.*(..))")
-	public void generalAllMethodASpect() {
-		logger.info("All Method Calls invoke this general aspect method");
-	}
-	
-	@AfterReturning("execution(public * com.rollingstone.spring.controller.*Controller.createProduct(..))")
-	public void getsCalledOnProductSave() {
-		logger.info("This aspect is fired when the save method of the controller is called");
-		productCreatedCounter.increment();
-	}
+    private final Logger logger = LoggerFactory.getLogger(RestControllerAspect.class);
+
+    private final Counter productCreatedCounter = Metrics.counter("com.rollingstone.product.created");
+
+    @Before("execution(public * com.rollingstone.spring.controller.*Controller.*(..))")
+    public void generalAllMethodASpect() {
+	logger.info("All Method Calls invoke this general aspect method");
+    }
+
+    @AfterReturning("execution(public * com.rollingstone.spring.controller.*Controller.createProduct(..)))")
+    public void getsCalledOnProductSave() {
+	logger.info("This aspect is fired when the save method of the controller is called");
+	productCreatedCounter.increment();
+    }
 }

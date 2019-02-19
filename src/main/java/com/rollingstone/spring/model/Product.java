@@ -201,11 +201,9 @@ public class Product {
 		} else if (!productName.equals(other.productName))
 			return false;
 		if (shortDescription == null) {
-			if (other.shortDescription != null)
-				return false;
-		} else if (!shortDescription.equals(other.shortDescription))
-			return false;
-		return true;
+		    return other.shortDescription == null;
+		} else
+		    return shortDescription.equals(other.shortDescription);
 	}
 
 	public Product() {
