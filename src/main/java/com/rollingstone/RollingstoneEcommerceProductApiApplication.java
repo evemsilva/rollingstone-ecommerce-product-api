@@ -9,6 +9,6 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 public class RollingstoneEcommerceProductApiApplication {
 
     public static void main(String[] args) {
-	SpringApplication.run(RollingstoneEcommerceProductApiApplication.class, args);
+        SpringApplication.run(RollingstoneEcommerceProductApiApplication.class, args);
     }
 }
