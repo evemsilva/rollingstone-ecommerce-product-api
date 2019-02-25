@@ -1,7 +1,10 @@
 package com.rollingstone.spring.service;
 
+import com.rollingstone.exceptions.HTTP400Exception;
 import com.rollingstone.spring.dao.ProductDaoRepository;
+import com.rollingstone.spring.model.Category;
 import com.rollingstone.spring.model.Product;
+import com.rollingstone.spring.service.feign.CategoryFeignInterface;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,26 +23,46 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private ProductDaoRepository productDao;
 
+    @Autowired
+    CategoryFeignInterface categoryClient;
+
     @Override
     public Product save(Product product) {
 
-        if (product.getCategory() == null) {
-            logger.info("Product Category is null :");
-        } else {
-            logger.info("Product Category is not null :" + product.getCategory());
-            logger.info("Product Category is not null ID :" + product.getCategory().getId());
+	Category category = null;
+	Category parentCategory = null;
 
-        }
+	if (product.getCategory() == null) {
+	    logger.info("Product Category is null :");
+	    throw new HTTP400Exception("Bad Request as Category Can not be empty");
+	} else {
+	    logger.info("Product Category is not null :" + product.getCategory());
+	    logger.info("Product Category is not null ID :" + product.getCategory().getId());
+	    try {
+		category = categoryClient.getCategory(product.getCategory().getId());
+	    }
+	    catch(Exception e) {
+		logger.info("Product Category Does not Exist :" + product.getCategory().getId());
+		throw new HTTP400Exception("Bad Request as the Category Provided is an Invalid one");
+	    }
+	}
+	if (product.getParentCategory() == null) {
+	    logger.info("Product Parent Category is null :");
+	    throw new HTTP400Exception("Bad Request as Parent Category Can not be empty");
+	} else {
+	    logger.info("Product Parent Category is not null :" + product.getParentCategory());
+	    logger.info("Product Parent Category is not null Id :" + product.getParentCategory().getId());
+	    try {
+		category = categoryClient.getCategory(product.getParentCategory().getId());
+	    }
+	    catch(Exception e) {
+		logger.info("Product Parent Category Does not Exist :" + product.getParentCategory().getId());
+		throw new HTTP400Exception("Bad Request as the Parent Category Provided is an Invalid one");
+	    }
 
-        if (product.getParentCategory() == null) {
-            logger.info("Product Parent Category is null :");
-        } else {
-            logger.info("Product Parent Category is not null :" + product.getParentCategory());
-            logger.info("Product Parent Category is not null Id :" + product.getParentCategory().getId());
+	}
 
-        }
-
-        return productDao.save(product);
+	return productDao.save(product);
     }
 
     @Override
