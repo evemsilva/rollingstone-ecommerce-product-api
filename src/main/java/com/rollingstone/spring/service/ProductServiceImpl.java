@@ -1,5 +1,6 @@
 package com.rollingstone.spring.service;
 
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.rollingstone.exceptions.HTTP400Exception;
 import com.rollingstone.spring.dao.ProductDaoRepository;
 import com.rollingstone.spring.model.Category;
@@ -27,6 +28,7 @@ public class ProductServiceImpl implements ProductService {
     CategoryFeignInterface categoryClient;
 
     @Override
+    @HystrixCommand(fallbackMethod = "saveWithoutValidation")
     public Product save(Product product) {
 
 	Category category = null;
@@ -71,6 +73,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @HystrixCommand(fallbackMethod = "getProductsByPageFallback")
     public Page<Product> getProductsByPage(Integer pageNumber, Integer pageSize) {
         Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("productCode").descending());
         return productDao.findAll(pageable);
@@ -84,6 +87,16 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public void delete(long id) {
         productDao.deleteById(id);
+    }
+
+    public Page<Product> getProductsByPageFallback(Integer pageNumber, Integer pageSize) {
+	logger.info("Circuit Breaker Enabled Searching Product.");
+	return Page.empty();
+    }
+
+    public Product saveWithoutValidation(Product product) {
+	logger.info("Circuit Breaker Enabled Saving Product without Category Validation.");
+	return productDao.save(product);
     }
 
 }
